@@ -66,7 +66,7 @@ var markdownOptions = {
 	langPrefix: '',
 	linkify: true,
 	linkTarget: '_blank" rel="noreferrer',
-	typographer:  true,
+	typographer: true,
 	quotes: `""''`,
 
 	doHighlight: true,
@@ -76,12 +76,12 @@ var markdownOptions = {
 		if (lang && hljs.getLanguage(lang)) {
 			try {
 				return hljs.highlight(lang, str).value;
-			} catch (__) {}
+			} catch (__) { }
 		}
 
 		try {
 			return hljs.highlightAuto(str).value;
-		} catch (__) {}
+		} catch (__) { }
 
 		return '';
 	}
@@ -119,14 +119,14 @@ md.renderer.rules.image = function (tokens, idx, options) {
 		return '<a href="' + src + '" target="_blank" rel="noreferrer"><img' + scrollOnload + imgSrc + alt + title + suffix + '></a>';
 	}
 
-  return '<a href="' + src + '" target="_blank" rel="noreferrer">' + Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(src)) + '</a>';
+	return '<a href="' + src + '" target="_blank" rel="noreferrer">' + Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(src)) + '</a>';
 };
 
-md.renderer.rules.text = function(tokens, idx) {
+md.renderer.rules.text = function (tokens, idx) {
 	tokens[idx].content = Remarkable.utils.escapeHtml(tokens[idx].content);
 
 	if (tokens[idx].content.indexOf('?') !== -1) {
-		tokens[idx].content = tokens[idx].content.replace(/(^|\s)(\?)\S+?(?=[,.!?:)]?\s|$)/gm, function(match) {
+		tokens[idx].content = tokens[idx].content.replace(/(^|\s)(\?)\S+?(?=[,.!?:)]?\s|$)/gm, function (match) {
 			var channelLink = Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(match.trim()));
 			var whiteSpace = '';
 			if (match[0] !== '?') {
@@ -136,7 +136,7 @@ md.renderer.rules.text = function(tokens, idx) {
 		});
 	}
 
-  return tokens[idx].content;
+	return tokens[idx].content;
 };
 
 md.use(remarkableKatex);
@@ -146,7 +146,7 @@ var verifyNickname = function (nick) {
 };
 
 // cookie set, get and delete.
-function setAccountCookie(value){
+function setAccountCookie(value) {
 	var nowDate = new Date();
 	nowDate.setTime(nowDate.getTime() + 1296000000);		// 15 days
 	document.cookie = "CrosstAccount=" + value + "; expires=" + nowDate.toGMTString() + "; path=/";
@@ -179,12 +179,12 @@ function getNickToJoin(channel) {
 		return false;
 	}
 	if (input.search("#") == -1) {
-		send({ cmd: 'join', channel: channel, nick: input, clientName, clientKey});
+		send({ cmd: 'join', channel: channel, nick: input, clientName, clientKey });
 		myNick = input;
 	}
 	else {
 		input = input.split("#", 2);
-		send({ cmd: 'join', channel: channel, nick: input[0], password: input[1], clientName, clientKey});
+		send({ cmd: 'join', channel: channel, nick: input[0], password: input[1], clientName, clientKey });
 		myNick = input[0];
 	}
 	return true;
@@ -226,11 +226,12 @@ function notify(args) {
 }
 
 function getHomepage() {
-	
+
 	ws = new WebSocket('wss://ws.crosst.chat:35197/');
+	// ws = new WebSocket('ws://localhost:8080/');
 
 	ws.onerror = function (event) {
-		pushMessage({ text: "# dx_xb\n连接聊天室服务器失败，请稍候重试。\n**如果这个问题持续出现，请立刻联系 mail@to.henrize.kim 感谢您的理解和支持**", nick: '!'});
+		pushMessage({ text: "# dx_xb\n连接聊天室服务器失败，请稍候重试。\n**如果这个问题持续出现，请立刻联系 mail@to.henrize.kim 感谢您的理解和支持**", nick: '!' });
 	}
 
 	var reqSent = false;
@@ -249,17 +250,18 @@ function getHomepage() {
 			args.ver = "获取失败";
 			args.online = "获取失败";
 		}
-		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以创建自己的聊天室。\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
+		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以**[点击这里](./jump.html)**创建自己的聊天室或者加入其它聊天室。\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
 		pushMessage({ text: homeText });
 	}
 }
 
 function join(channel) {
-	
+
 	ws = new WebSocket('wss://ws.crosst.chat:35197/');
+	// ws = new WebSocket('ws://localhost:8080/');
 
 	ws.onerror = function (event) {
-		pushMessage({ text: "# dx_xb\n连接聊天室服务器失败，请稍候重试。\n**如果这个问题持续出现，请立刻联系 mail@to.henrize.kim 感谢您的理解和支持**", nick: '!'});
+		pushMessage({ text: "# dx_xb\n连接聊天室服务器失败，请稍候重试。\n**如果这个问题持续出现，请立刻联系 mail@to.henrize.kim 感谢您的理解和支持**", nick: '!' });
 	}
 
 	var wasConnected = false;
@@ -269,16 +271,16 @@ function join(channel) {
 		if (loginCookie) {
 			accountStr = loginCookie.slice(21);
 			if (!loginCookie.startsWith("nopassword-nopassword")) {
-				accountStr = "[" + loginCookie.slice(0,6) + "] " + accountStr;
+				accountStr = "[" + loginCookie.slice(0, 6) + "] " + accountStr;
 			}
 			if (localStorageGet("auto-login") == "true") {
-				send({ cmd: 'join', channel: channel, cookie: loginCookie, clientName, clientKey});
+				send({ cmd: 'join', channel: channel, cookie: loginCookie, clientName, clientKey });
 				myNick = loginCookie.slice(21);
 				wasConnected = true;
 			}
 			else {
-				if (window.confirm("以上次的昵称登录？\n" + accountStr) ) {
-					send({ cmd: 'join', channel: channel, cookie: loginCookie, clientName, clientKey});
+				if (window.confirm("以上次的昵称登录？\n" + accountStr)) {
+					send({ cmd: 'join', channel: channel, cookie: loginCookie, clientName, clientKey });
 					myNick = loginCookie.slice(21);
 					wasConnected = true;
 				}
@@ -339,7 +341,7 @@ var COMMANDS = {
 		if (args.cookie != null) {
 			accountStr = args.cookie.slice(21);
 			if (!args.cookie.startsWith("nopassword-nopassword")) {
-				accountStr = "[" + args.cookie.slice(0,6) + "] " + accountStr;
+				accountStr = "[" + args.cookie.slice(0, 6) + "] " + accountStr;
 			}
 			document.getElementById("account-name").innerHTML = accountStr;
 			setAccountCookie(args.cookie);
@@ -350,11 +352,11 @@ var COMMANDS = {
 
 		document.getElementById("version-text").innerHTML = args.ver;
 
-		pushMessage({ nick: '*', text: "在线的用户：" + nicks.join(", ")})
+		pushMessage({ nick: '*', text: "在线的用户：" + nicks.join(", ") })
 	},
 
 	onlineAdd: function (args) {
-		if (args.nick != myNick){
+		if (args.nick != myNick) {
 			userAdd(args.nick);
 
 			if ($('#joined-left').checked) {
@@ -465,8 +467,40 @@ function pushMessage(args) {
 	if (args.trip != "/Time/") {
 		unread += 1;
 	}
-	
+
 	updateTitle();
+	updateNotice(args);
+}
+
+var messageTemp = Array();
+const messageTempLen = 4;
+
+function updateNotice(args) {
+	if (args.cmd != 'chat' || args.nick == myNick) return;
+	messageTemp.push(args);
+	if (messageTemp.length > messageTempLen)
+		messageTemp = messageTemp.slice(1);
+	if (windowActive) return;
+	var texts = [];
+	for (message of messageTemp) {
+		let m = {};
+		if (!message.nick) m.person = 'User';
+		else m.person = message.nick;
+		m.message = message.text;
+		texts.push(m);
+	}
+	cordova.plugins.notification.local.schedule({
+		id: 1,
+		title: 'room',
+		// icon: 'http://climberindonesia.com/assets/icon/ionicons-2.0.1/png/512/android-chat.png',
+		text: texts,
+		actions: [{
+			id: 'reply',
+			type: 'input',
+			title: '回复',
+			emptyText: '输入回复',
+		}]
+	});
 }
 
 function insertAtCursor(text) {
@@ -491,15 +525,37 @@ function send(data) {
 var windowActive = true;
 var unread = 0;
 
-window.onfocus = function () {
+function my_onfocus() {
 	windowActive = true;
-
+	messageTemp = Array();
 	updateTitle();
+	cordova.plugins.notification.local.cancelAll();
+	cordova.plugins.notification.local.setDefaults({
+		vibrate: true
+	});
 }
+window.onfocus = my_onfocus;
 
-window.onblur = function () {
+function my_onblur() {
 	windowActive = false;
 }
+window.onblur = my_onblur();
+// 注册Cordova的组件
+document.addEventListener('deviceready', my_onfocus, false);
+document.addEventListener('pause', my_onblur, false);
+document.addEventListener('resume', my_onfocus, false);
+setTimeout(function () {
+	cordova.plugins.notification.local.on('reply', function (notification, eopts) {
+		// console.log(notification, eopts);
+		let text = '...';
+		if (eopts.text) text = eopts.text;
+		send({ cmd: 'chat', text: text });
+		lastSent[0] = text;
+		lastSent.unshift("");
+		lastSentPos = 0;
+	});
+}, 300);
+
 
 window.onscroll = function () {
 	if (isAtBottom()) {
@@ -533,6 +589,7 @@ function updateTitle() {
 	}
 
 	document.title = title;
+	$('#title').innerText = title;
 }
 
 $('#auto-login').onchange = function (e) {
@@ -544,11 +601,36 @@ $('#clear-account').onclick = function () {
 	$('#auto-login').checked = false;
 	localStorageSet('auto-login', false);
 	document.getElementById("auto-login").disabled = true;
-	let message = {nick: "*", text: "记录的账号信息已删除。"};
+	let message = { nick: "*", text: "记录的账号信息已删除。" };
 	pushMessage(message);
 }
 
 $('#footer').onclick = function () {
+	$('#chatinput').focus();
+}
+
+// 切换上传文件那个窗口的状态
+var uploader_open = true;
+$('#uploader-button').onclick = function () {
+	let iframe = $('#uploader-iframe')
+	if (!iframe) return;
+	if (uploader_open)
+		iframe.classList.add('hidden');
+	else
+		iframe.classList.remove('hidden');
+	uploader_open = !uploader_open;
+}
+
+function uploaderLoadDone(height) {
+	height = 350;
+	$('#uploader-iframe').height = height;
+	if ($('#uploader-button').onclick)
+		$('#uploader-button').onclick();
+}
+
+$('#emote').onchange = function () {
+	el = $('#emote');
+	insertAtCursor(el.options[el.selectedIndex].value);
 	$('#chatinput').focus();
 }
 
@@ -665,16 +747,19 @@ updateInputSize();
 $('#sidebar').onmouseenter = $('#sidebar').ontouchstart = function (e) {
 	$('#sidebar-content').classList.remove('hidden');
 	$('#sidebar').classList.add('expand');
-	e.stopPropagation();
+	if (e)
+		e.stopPropagation();
 }
 
 $('#sidebar').onmouseleave = document.ontouchstart = function (event) {
-	var e = event.toElement || event.relatedTarget;
-	try {
-		if (e.parentNode == this || e == this) {
-	     return;
-	  }
-	} catch (e) { return; }
+	if (event) {
+		var e = event.toElement || event.relatedTarget;
+		try {
+			if (e.parentNode == this || e == this) {
+				return;
+			}
+		} catch (e) { return; }
+	}
 
 	if (!$('#pin-sidebar').checked) {
 		$('#sidebar-content').classList.add('hidden');
@@ -709,8 +794,8 @@ if (localStorageGet('joined-left') == 'false') {
 
 if (localStorageGet('parse-latex') == 'false') {
 	$('#parse-latex').checked = false;
-	md.inline.ruler.disable([ 'katex' ]);
-	md.block.ruler.disable([ 'katex' ]);
+	md.inline.ruler.disable(['katex']);
+	md.block.ruler.disable(['katex']);
 }
 
 $('#pin-sidebar').onchange = function (e) {
@@ -725,11 +810,11 @@ $('#parse-latex').onchange = function (e) {
 	var enabled = !!e.target.checked;
 	localStorageSet('parse-latex', enabled);
 	if (enabled) {
-		md.inline.ruler.enable([ 'katex' ]);
-		md.block.ruler.enable([ 'katex' ]);
+		md.inline.ruler.enable(['katex']);
+		md.block.ruler.enable(['katex']);
 	} else {
-		md.inline.ruler.disable([ 'katex' ]);
-		md.block.ruler.disable([ 'katex' ]);
+		md.inline.ruler.disable(['katex']);
+		md.block.ruler.disable(['katex']);
 	}
 }
 
@@ -837,13 +922,13 @@ function setScheme(scheme) {
 	$('#scheme-link').href = "./schemes/" + scheme + ".css";
 	switch (scheme) {
 		case '黑色系 - 寒夜': setHighlight('rainbow');
-		break;
+			break;
 		case '青色系 - 初夏': setHighlight('tomorrow');
-		break;
+			break;
 		case '黑色系 - 都市': setHighlight('atom-one-dark');
-		break;
+			break;
 		case '黑色系 - 荧黄': setHighlight('zenburn');
-		break;
+			break;
 	}
 	localStorageSet('scheme', scheme);
 }
@@ -899,6 +984,8 @@ if (myChannel == '') {
 	getHomepage();
 	$('#footer').classList.add('hidden');
 	$('#sidebar').classList.add('hidden');
+	$('#header').classList.add('hidden');
+	$('.container').setAttribute('style', 'margin-top: 0px;');
 } else {
 	join(myChannel);
 }

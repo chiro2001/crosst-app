@@ -3,6 +3,11 @@ body {
   color: #c3cbd1;
   font-family: Default_sans;
 }
+header {
+  background: #1a1f28;
+  border:1px solid #869ec8;
+  font-family: Default_sans;
+}
 textarea {
   color: #c3cbd1;
   font-family: Default_sans;

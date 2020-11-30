@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+  <title>文件上传器</title>
+  <link rel="stylesheet" href="css/mdui.min.css">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-88818678-1');
+  </script>
+  <style type="text/css">
+    .round_icon {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="mdui-loaded mdui-theme-accent-pink mdui-theme-primary-yellow mdui-typo"
+  style="background: #2b303b; color: #c0c5ce;">
+  <div class="mdui-container">
+    <h1>文件上传器</h1>
+    <p>可以选择多个文件</p>
+    <div class="mdui-progress" style="width: 100%">
+      <div class="mdui-progress-determinate"></div>
+    </div>
+
+    <form enctype="multipart/form-data">
+      <input name="file" type="file" id="file" multiple="" class="mdui-btn mdui-ripple" accept="*/*" />
+    </form>
+    <button onclick="figurebedUpload()" class="mdui-btn mdui-ripple mdui-color-theme">上传</button>
+    <button class="mdui-btn mdui-ripple btn-copy mdui-color-theme" style="display: none" data-clipboard-action="copy"
+      data-clipboard-target="#bed-result">复制Markdown</button>
+    <div class="mdui-typo" id="figurebed-result">
+      <div class="mdui-textfield">
+        <textarea id="bed-result" class="mdui-textfield-input" type="text" autocomplete="off"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/mdui.min.js"></script>
+  <script src="js/cos-js-sdk-v5.min.js"></script>
+  <script src="js/clipboard.min.js"></script>
+  <script>var $$ = mdui.JQ;</script>
+  <script>var $_ = $</script>
+  <script src="js/cbase.js"></script>
+  <script src="js/main.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function () {
+      window.parent.uploaderLoadDone(document.body.scrollHeight);
+    });
+  </script>
+</body>
+
+</html>

@@ -107,6 +107,13 @@ ul li {
 .text p {
   margin: 0;
 }
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  font-size: 12px;
+}
+
 #footer {
   position: fixed;
   bottom: 0;
