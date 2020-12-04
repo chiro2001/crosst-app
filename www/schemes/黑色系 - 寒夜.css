@@ -3,6 +3,12 @@ body {
   color: #c0c5ce;
   font-family: Default_sans;
 }
+input {
+  color: #c0c5ce;
+  background: #2b303b;
+  height: 25px;
+  width: 100%;
+}
 header {
   background: #2b303b;
   border:1px solid #65737e;

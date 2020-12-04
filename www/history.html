@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>历史记录 - 十字街</title>
+
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="./style.css">
+  <link id="scheme-link" rel="stylesheet" href="./schemes/%E9%BB%91%E8%89%B2%E7%B3%BB%20-%20%E5%AF%92%E5%A4%9C.css">
+
+  <link rel="stylesheet" href="./vendor/katex/katex.min.css">
+  <script src="./vendor/katex/katex.min.js"></script>
+  <script src="./vendor/remarkable-katex/remarkableKatex.min.js"></script>
+
+  <script src="./vendor/hljs/highlight.min.js"></script>
+  <link id="highlight-link" rel="stylesheet" href="./vendor/hljs/styles/rainbow.min.css">
+  <!-- <script src="https://cdn.staticfile.org/remarkable/1.7.1/remarkable.min.js"></script> -->
+  <script src="./vendor/remarkable/remarkable.min.js"></script>
+
+  <meta name="keywords" content="聊天室, 聊天, 匿名聊天, 纯文字聊天室, WebSocket, 即时聊天, 十字街, Henrize">
+  <meta name="description"
+    content="十字街是一个简洁轻小的匿名聊天网站，可以方便地加入和创建聊天室，仅需一个昵称即可开始畅聊。聊天室内支持 Markdown 和 LaTeX 格式化，并拥有便于开发的API。">
+
+
+</head>
+
+<body>
+  <header id="header" style="height: 44.5px;">
+    <center>
+      <p id="title">历史记录 - </p>
+    </center>
+  </header>
+  <article class="container" style="margin-top: 45px;">
+    <div id="messages" class="messages"></div>
+  </article>
+  <nav id="sidebar">
+    <div id="sidebar-content" class="hidden">
+      <h2>本地聊天记录</h2>
+      <hr />
+      <div>
+        下面未选择的参数则默认全选<br />
+        开始时间: <br /><input id="input-time-start" type="datetime-local" value="1970-01-01T00:00"><br />
+        结束时间: <br /><input id="input-time-stop" type="datetime-local"><br />
+        房间: <input id="input-room"><br />
+        昵称: <input id="input-nick"><br />
+        高亮显示昵称: <input id="input-hightlight"><br />
+        识别码: <input id="input-trip"><br />
+        内容: <input id="input-text"><br />
+      </div>
+      <br />
+      <button id="button-query">开始查询</button><br />
+      <p id="notice-query"></p><br />
+      <hr />
+      <button id="button-clear">清除本地记录</button><br />
+    </div>
+  </nav>
+  <!-- <script src="cordova.js"></script> -->
+  <!-- <script src="./client.js"></script> -->
+  <script src='./sidebar.js'></script>
+  <!-- <script type='module' src="./extra_history.js"></script> -->
+  <script src="./extra_history.js"></script>
+  <script>
+    history_main();
+  </script>
+  <script>
+  </script>
+</body>
+
+</html>

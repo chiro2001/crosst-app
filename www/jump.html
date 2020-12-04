@@ -198,11 +198,15 @@
   </nav>
   <!-- <script src="./client.js"></script> -->
   <script>
-    window.onload = function() {
+    window.onload = function () {
       console.log('ready');
       let input = undefined;
-      while (!input)
+      let retry = 3;
+      while (!input && retry) {
         input = window.prompt("请输入房间名字");
+        retry--;
+      }
+      if (!input) input = '公共聊天室';
       location.href = "./index.html?" + input;
     }
   </script>

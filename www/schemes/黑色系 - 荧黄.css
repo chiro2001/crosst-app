@@ -3,6 +3,9 @@ body {
   color: #ffab2d;
   font-family: Default_sans;
 }
+input {
+  color: #ffab2d;
+}
 header {
   background: #000000;
   border:1px solid #ab6a33;
