@@ -69,7 +69,7 @@ var ct_history = {
     this.room = room, this.myNick = myNick, this.highlight_user = highlight_user;
     // 建立数据库，大小2MB
     this.db = openDatabase('crosst', '1.0', 'Crosst chat\'s local Database!', 2 * 1024 * 1024);
-    console.log('db', this.db);
+    // console.log('db', this.db);
     window['ct_history'] = this;
     if ($("#button-query"))
       $("#button-query").onclick = this.query;
@@ -89,7 +89,7 @@ var ct_history = {
 
 
   insert_message: function (message) {
-    console.log('insert_message:', message);
+    // console.log('insert_message:', message);
     if (!message.nick) message.nick = '';
     if (message.time === undefined) message.time = new Date().getTime();
     if (!message.text) message.text = '';
@@ -99,7 +99,7 @@ var ct_history = {
       [message.time, message.room, message.nick, message.trip, message.text]);
   },
   find_messages: function (start = 0, stop = new Date().getTime(), room = '%', nick = '%', trip = '%', text = '%') {
-    console.log('find_messages:', start, stop, room, nick, text);
+    // console.log('find_messages:', start, stop, room, nick, text);
     return this.make_query("select time, room, nick, trip, text from messages " +
       " where time >= ? and time <= ? and room like ? and nick like ? and trip like ? and text like ?",
       [start, stop, room, nick, trip, text]).then(result => {
@@ -108,13 +108,13 @@ var ct_history = {
       })
   },
   clear_message_room: function (room = default_room) {
-    console.log('clear_message_room:', room);
+    // console.log('clear_message_room:', room);
     return this.make_query("delete from messages where room = ?", [room]);
   },
   clear_message_nick: function (nick = myNick) { },
   clear_message_time: function (start = 0, stop = new Date().getTime()) { },
   clear_message_all: function () {
-    console.log('clear_message_all');
+    // console.log('clear_message_all');
     return this.make_query("drop table messages");
   },
 
@@ -133,7 +133,7 @@ var ct_history = {
       try {
         $('#messages').innerHTML = '';
         let data = await ct_history.find_messages(start_time, stop_time, room, nick, trip, text);
-        console.log(data);
+        // console.log(data);
         for (let d of data) {
           ct_history.push_message(d);
         }
@@ -142,6 +142,9 @@ var ct_history = {
         setTimeout(() => {
           $("#notice-query").innerText = "";
         }, 1000);
+        setTimeout(() => {
+          window.scrollTo(0, document.body.scrollHeight);
+        }, 50)
       } catch (err) {
         console.error(err);
         $("#notice-query").classList.add("warn");
@@ -151,7 +154,7 @@ var ct_history = {
   },
 
   // DOM操作部分
-  push_message: function (args) {
+  push_message: function (args, push = true) {
     // Message container
     var messageEl = document.createElement('div');
 
@@ -174,14 +177,14 @@ var ct_history = {
     var nickSpanEl = document.createElement('span');
     nickSpanEl.classList.add('nick');
     messageEl.appendChild(nickSpanEl);
-
+    if (args.trip && args.room) args.trip = `[${args.room}] ${args.trip}`;
+    else if (!args.trip && args.room) args.trip = `[${args.room}]`;
     if (args.trip) {
       var tripEl = document.createElement('span');
       tripEl.textContent = args.trip + " ";
       tripEl.classList.add('trip');
       nickSpanEl.appendChild(tripEl);
     }
-
     if (args.nick) {
       var nickLinkEl = document.createElement('a');
       nickLinkEl.textContent = args.nick;
@@ -200,7 +203,8 @@ var ct_history = {
 
     // Scroll to bottom
     // var atBottom = isAtBottom();
-    $('#messages').appendChild(messageEl);
+    if (push)
+      $('#messages').appendChild(messageEl);
     // if (atBottom) {
     //   window.scrollTo(0, document.body.scrollHeight);
     // }
@@ -211,18 +215,18 @@ async function history_main() {
   sidebar.init_event();
   // 设置结束时间为当前
   // 只适合中文地区...
-  let date_str = new Date().toLocaleString().replaceAll('/', '-').split(' ');
-  let month = date_str[0].split('-')[1];
-  let day = date_str[0].split('-')[2];
-  if (month.length == 1) month = '0' + month;
-  if (day.length == 1) day = '0' + day;
-  date_str[0] = date_str[0].split('-')[0] + '-' + month + '-' + day;
-  let hour = parseInt(date_str[1].slice(2, 4));
-  if (date_str[1][0] == '下') hour += 12;
-  let time = '' + hour + date_str[1].slice(4, 7);
-  let val_now = date_str[0] + 'T' + time;
-  console.log(val_now);
-  $("#input-time-stop").value = val_now;
+  // let date_str = new Date().toLocaleString().replaceAll('/', '-').split(' ');
+  // let month = date_str[0].split('-')[1];
+  // let day = date_str[0].split('-')[2];
+  // if (month.length == 1) month = '0' + month;
+  // if (day.length == 1) day = '0' + day;
+  // date_str[0] = date_str[0].split('-')[0] + '-' + month + '-' + day;
+  // let hour = parseInt(date_str[1].slice(2, 4));
+  // if (date_str[1][0] == '下') hour += 12;
+  // let time = '' + hour + date_str[1].slice(4, 7);
+  // let val_now = date_str[0] + 'T' + time;
+  // console.log(val_now);
+  // $("#input-time-stop").value = val_now;
 
   // ct_history.find_messages().then(function(d) {
   //   console.log(d)
@@ -233,10 +237,10 @@ async function history_main() {
 
   await (async function () {
     try {
-      ct_history.insert_message({ time: 0, nick: 'Chiro1', text: 'sfda' });
-      ct_history.insert_message({ time: 1, nick: 'Chiro2', text: 'sfda' });
-      ct_history.insert_message({ time: 2, nick: 'Chiro3', text: 'sfda' });
-      ct_history.insert_message({ time: 10, nick: 'Chiro4', text: 'sfda', trip: "5SHI" });
+      // ct_history.insert_message({ time: 0, nick: 'Chiro1', text: 'sfda' });
+      // ct_history.insert_message({ time: 1, nick: 'Chiro2', text: 'sfda' });
+      // ct_history.insert_message({ time: 2, nick: 'Chiro3', text: 'sfda' });
+      // ct_history.insert_message({ time: 10, nick: 'Chiro4', text: 'sfda', trip: "5SHI" });
 
       // let data = await ct_history.find_messages(0, 3);
       // let data = await ct_history.find_messages();

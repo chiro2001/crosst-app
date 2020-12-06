@@ -28,8 +28,10 @@
 </head>
 
 <body>
-  <header id="header" style="height: 44.5px;">
-    <center>
+  <header id="header"
+    style="height: 44.5px; display: flex; display: -webkit-flex; justify-content: flex-start; align-items: center;">
+    <button id="button-close" style="margin-left: 8px;">X</button>
+    <center style="width: 100%">
       <p id="title">历史记录 - </p>
     </center>
   </header>
@@ -41,14 +43,16 @@
       <h2>本地聊天记录</h2>
       <hr />
       <div>
-        下面未选择的参数则默认全选<br />
-        开始时间: <br /><input id="input-time-start" type="datetime-local" value="1970-01-01T00:00"><br />
-        结束时间: <br /><input id="input-time-stop" type="datetime-local"><br />
-        房间: <input id="input-room"><br />
-        昵称: <input id="input-nick"><br />
-        高亮显示昵称: <input id="input-hightlight"><br />
-        识别码: <input id="input-trip"><br />
-        内容: <input id="input-text"><br />
+        下面未选择的参数则默认全选。<br />
+        参数可指定为SQL匹配符号。<br />
+        开始时间: <br /><input class="input-query" id="input-time-start" type="datetime-local"
+          value="1970-01-01T00:00"><br />
+        结束时间: <br /><input class="input-query" id="input-time-stop" type="datetime-local"><br />
+        房间: <input class="input-query" id="input-room"><br />
+        昵称: <input class="input-query" id="input-nick"><br />
+        高亮显示昵称: <input class="input-query" id="input-hightlight"><br />
+        识别码: <input class="input-query" id="input-trip"><br />
+        内容: <input class="input-query" id="input-text"><br />
       </div>
       <br />
       <button id="button-query">开始查询</button><br />
@@ -66,6 +70,12 @@
     history_main();
   </script>
   <script>
+    if (typeof window.parent.history_close == 'undefined')
+      $("#button-close").classList.add("hidden");
+    if ($("#button-close")) $("#button-close").onclick = function () {
+      if (typeof window.parent.history_close != 'undefined')
+        window.parent.history_close();
+    }
   </script>
 </body>
 

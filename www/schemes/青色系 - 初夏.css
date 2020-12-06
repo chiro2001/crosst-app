@@ -3,8 +3,11 @@ body {
   color: #698aab;
   font-family: Default_sans;
 }
-input {
+.input-query {
   color: #698aab;
+  background: #eaedf7;
+  height: 25px;
+  width: 100%;
 }
 header {
   background: #eaedf7;

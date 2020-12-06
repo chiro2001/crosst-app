@@ -63,7 +63,8 @@
   <script src="js/main.js"></script>
   <script type="application/javascript">
     $(document).ready(function () {
-      window.parent.uploaderLoadDone(document.body.scrollHeight);
+      if (typeof window.parent.uploaderLoadDone != 'undefined')
+        window.parent.uploaderLoadDone(document.body.scrollHeight);
     });
   </script>
 </body>

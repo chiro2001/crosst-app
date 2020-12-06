@@ -3,7 +3,7 @@ body {
   color: #c0c5ce;
   font-family: Default_sans;
 }
-input {
+.input-query {
   color: #c0c5ce;
   background: #2b303b;
   height: 25px;

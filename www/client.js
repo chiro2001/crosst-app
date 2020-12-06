@@ -54,8 +54,10 @@
  */
 
 if (typeof clientName !== "string") {
-	var clientName = "[十字街网页版](https://crosst.chat/)";
-	var clientKey = "/bG0bpXTJVKgQ58";
+	// "clientName": "[十字街网页版](https://crosst.chat/)",
+	// "clientKey": "/bG0bpXTJVKgQ58,"
+	var clientName = "[Chatino客户端](http://chatino.chiro.work/)";
+	var clientKey = "X7t4qkI5Lz+cext";
 }
 
 var api = 'wss://ws.crosst.chat:35197/';
@@ -147,6 +149,15 @@ md.use(remarkableKatex);
 var verifyNickname = function (nick) {
 	return /^[a-zA-Z0-9\u4e00-\u9fa5_]{1,24}$/.test(nick);
 };
+
+function isExitsFunction(funcName) {
+	try {
+		if (typeof (eval(funcName)) == "function") {
+			return true;
+		}
+	} catch (e) { }
+	return false;
+}
 
 // cookie set, get and delete.
 function setAccountCookie(value) {
@@ -496,7 +507,15 @@ function pushMessage(args) {
 	updateTitle();
 	updateNotice(args);
 	if (ct_history) {
-		ct_history.push_message(args);
+		// ct_history.push_message(args, false);
+		if (args.nick != '!' && args.nick) {
+			args.room = myChannel;
+			ct_history.insert_message(args).then(() => {
+				setTimeout(() => {
+					frames['chat_history'].ct_history.query();
+				}, 100);
+			});
+		}
 	}
 }
 
@@ -558,10 +577,12 @@ function my_onfocus() {
 	windowActive = true;
 	messageTemp = Array();
 	updateTitle();
-	cordova.plugins.notification.local.cancelAll();
-	cordova.plugins.notification.local.setDefaults({
-		vibrate: true
-	});
+	if ("undefined" != typeof cordova) {
+		cordova.plugins.notification.local.cancelAll();
+		cordova.plugins.notification.local.setDefaults({
+			vibrate: true
+		});
+	}
 }
 window.onfocus = my_onfocus;
 
@@ -574,7 +595,7 @@ document.addEventListener('deviceready', my_onfocus, false);
 document.addEventListener('pause', my_onblur, false);
 document.addEventListener('resume', my_onfocus, false);
 setTimeout(function () {
-	if (!cordova) return;
+	if (typeof cordova == 'undefined' || typeof cordova.plugins.notification == 'undefined') return;
 	cordova.plugins.notification.local.on('reply', function (notification, eopts) {
 		// console.log(notification, eopts);
 		let text = '...';
@@ -775,9 +796,87 @@ updateInputSize();
 /* sidebar */
 sidebar.init();
 
-/* main */
+// User list
+var onlineUsers = [];
+var ignoredUsers = [];
+
+function userAdd(nick) {
+	var user = document.createElement('a');
+	user.textContent = nick;
+
+	user.onclick = function (e) {
+		userInvite(nick)
+	}
+
+	var userLi = document.createElement('li');
+	userLi.appendChild(user);
+	$('#users').appendChild(userLi);
+	onlineUsers.push(nick);
+}
+
+function userRemove(nick) {
+	var users = $('#users');
+	var children = users.children;
+
+	for (var i = 0; i < children.length; i++) {
+		var user = children[i];
+		if (user.textContent == nick) {
+			users.removeChild(user);
+		}
+	}
+
+	var index = onlineUsers.indexOf(nick);
+	if (index >= 0) {
+		onlineUsers.splice(index, 1);
+	}
+}
+
+function usersClear() {
+	var users = $('#users');
+
+	while (users.firstChild) {
+		users.removeChild(users.firstChild);
+	}
+
+	onlineUsers.length = 0;
+}
+
+function userInvite(nick) {
+	send({ cmd: 'invite', nick: nick });
+}
+
+function userIgnore(nick) {
+	ignoredUsers.push(nick);
+}
+
+/* setup ct_history */
 ct_history.room = myChannel
 ct_history.init();
+window.onresize = function () {
+	if (!$("#chat_history")) return;
+	$("#chat_history").style.width = document.documentElement.clientWidth - $("#sidebar").clientWidth + 'px';
+	$("#chat_history").style.height = document.documentElement.clientHeight - $("#footer").clientHeight - 44.5 + 'px';
+};
+window.onresize();
+var history_open = true;
+$('#history-button').onclick = function () {
+	let iframe = $('#chat_history')
+	if (!iframe) return;
+	if (history_open)
+		iframe.classList.add('hidden');
+	else {
+		iframe.classList.remove('hidden');
+		frames['chat_history'].ct_history.query();
+	}
+	history_open = !history_open;
+}
+$('#history-button').onclick();
+function history_close() {
+	history_open = false;
+	$('#chat_history').classList.add('hidden');
+}
+
+/* main */
 if (myChannel == '') {
 	getHomepage();
 	$('#footer').classList.add('hidden');

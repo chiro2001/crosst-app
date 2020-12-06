@@ -6,7 +6,11 @@
   "main": "index.js",
   "scripts": {
     "run_android": "cordova run android",
-    "run_browser": "cordova run browser"
+    "run_browser": "cordova run browser",
+    "build_android": "cordova build android",
+    "build_browser": "cordova run browser",
+    "build_android_release": "cordova build android --release",
+    "release": "cordova build android --release && release"
   },
   "keywords": [
     "ecosystem:cordova"

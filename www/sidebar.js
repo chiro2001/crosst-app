@@ -1,25 +1,49 @@
-if (!$)
+if (typeof $ == 'undefined')
 	function $(query) {
 		return document.querySelector(query);
 	}
 
-if (!localStorageGet)
+if (typeof localStorageGet == 'undefined')
 	function localStorageGet(key) {
 		try {
 			return window.localStorage[key];
 		} catch (e) { }
 	}
 
-if (!localStorageSet)
+if (typeof localStorageSet == 'undefined')
 	function localStorageSet(key, val) {
 		try {
 			window.localStorage[key] = val;
 		} catch (e) { }
 	}
 
+if (typeof setScheme == 'undefined')
+	function setScheme(scheme) {
+		currentScheme = scheme;
+		$('#scheme-link').href = "./schemes/" + scheme + ".css";
+		switch (scheme) {
+			case '黑色系 - 寒夜': setHighlight('rainbow');
+				break;
+			case '青色系 - 初夏': setHighlight('tomorrow');
+				break;
+			case '黑色系 - 都市': setHighlight('atom-one-dark');
+				break;
+			case '黑色系 - 荧黄': setHighlight('zenburn');
+				break;
+		}
+		localStorageSet('scheme', scheme);
+	}
+if (typeof setHighlight == 'undefined')
+	function setHighlight(scheme) {
+		currentHighlight = scheme;
+		$('#highlight-link').href = "./vendor/hljs/styles/" + scheme + ".min.css";
+		localStorageSet('highlight', scheme);
+	}
+
 var sidebar = {
-	init_event: function() {
+	init_event: function () {
 		$('#sidebar').onmouseenter = $('#sidebar').ontouchstart = function (e) {
+			if (window.onresize) setTimeout(window.onresize, 50);
 			$('#sidebar-content').classList.remove('hidden');
 			$('#sidebar').classList.add('expand');
 			if (e)
@@ -27,6 +51,7 @@ var sidebar = {
 		}
 
 		$('#sidebar').onmouseleave = document.ontouchstart = function (event) {
+			if (window.onresize) setTimeout(window.onresize, 50);
 			if (event) {
 				var e = event.toElement || event.relatedTarget;
 				try {
@@ -40,6 +65,16 @@ var sidebar = {
 				$('#sidebar-content').classList.add('hidden');
 				$('#sidebar').classList.remove('expand');
 			}
+		}
+
+		// Load sidebar configaration values from local storage if available
+		console.log('scheme', localStorageGet('scheme'));
+		if (localStorageGet('scheme')) {
+			setScheme(localStorageGet('scheme'));
+		}
+
+		if (localStorageGet('highlight')) {
+			setHighlight(localStorageGet('highlight'));
 		}
 	},
 	init: function () {
@@ -118,59 +153,6 @@ var sidebar = {
 			allowImages = enabled;
 		}
 
-		// User list
-		var onlineUsers = [];
-		var ignoredUsers = [];
-
-		function userAdd(nick) {
-			var user = document.createElement('a');
-			user.textContent = nick;
-
-			user.onclick = function (e) {
-				userInvite(nick)
-			}
-
-			var userLi = document.createElement('li');
-			userLi.appendChild(user);
-			$('#users').appendChild(userLi);
-			onlineUsers.push(nick);
-		}
-
-		function userRemove(nick) {
-			var users = $('#users');
-			var children = users.children;
-
-			for (var i = 0; i < children.length; i++) {
-				var user = children[i];
-				if (user.textContent == nick) {
-					users.removeChild(user);
-				}
-			}
-
-			var index = onlineUsers.indexOf(nick);
-			if (index >= 0) {
-				onlineUsers.splice(index, 1);
-			}
-		}
-
-		function usersClear() {
-			var users = $('#users');
-
-			while (users.firstChild) {
-				users.removeChild(users.firstChild);
-			}
-
-			onlineUsers.length = 0;
-		}
-
-		function userInvite(nick) {
-			send({ cmd: 'invite', nick: nick });
-		}
-
-		function userIgnore(nick) {
-			ignoredUsers.push(nick);
-		}
-
 		/* color scheme switcher */
 
 		var schemes = [
@@ -192,30 +174,10 @@ var sidebar = {
 			'zenburn'
 		]
 
-		var currentScheme = '黑色系 - 寒夜';
-		var currentHighlight = 'rainbow';
-
-		function setScheme(scheme) {
-			currentScheme = scheme;
-			$('#scheme-link').href = "./schemes/" + scheme + ".css";
-			switch (scheme) {
-				case '黑色系 - 寒夜': setHighlight('rainbow');
-					break;
-				case '青色系 - 初夏': setHighlight('tomorrow');
-					break;
-				case '黑色系 - 都市': setHighlight('atom-one-dark');
-					break;
-				case '黑色系 - 荧黄': setHighlight('zenburn');
-					break;
-			}
-			localStorageSet('scheme', scheme);
-		}
-
-		function setHighlight(scheme) {
-			currentHighlight = scheme;
-			$('#highlight-link').href = "./vendor/hljs/styles/" + scheme + ".min.css";
-			localStorageSet('highlight', scheme);
-		}
+		var currentScheme = localStorageGet('scheme');
+		if (!currentScheme) currentScheme = '黑色系 - 寒夜';
+		var currentHighlight = localStorageGet('highlight');
+		if (!currentHighlight) currentHighlight = 'rainbow';
 
 		// Add scheme options to dropdown selector
 		schemes.forEach(function (scheme) {
@@ -238,10 +200,12 @@ var sidebar = {
 
 		$('#scheme-selector').onchange = function (e) {
 			setScheme(e.target.value);
+			if (frames['chat_history']) frames['chat_history'].location.reload();
 		}
 
 		$('#highlight-selector').onchange = function (e) {
 			setHighlight(e.target.value);
+			if (frames['chat_history']) frames['chat_history'].location.reload();
 		}
 
 		// Load sidebar configaration values from local storage if available
@@ -256,7 +220,7 @@ var sidebar = {
 		$('#scheme-selector').value = currentScheme;
 		$('#highlight-selector').value = currentHighlight;
 	},
-	hide: function() {
+	hide: function () {
 		$('#sidebar').classList.add('hidden');
 	}
 };
