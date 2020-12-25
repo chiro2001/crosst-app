@@ -5,6 +5,13 @@
 // import InDB from './vendor/indb/indb.js';
 
 // initialize markdown engine
+var historyAllowImages = false;
+if (typeof imgHostWhitelist === 'undefined')
+  var imgHostWhitelist = [
+    'i.loli.net',							// sm.ms
+    's1.ax1x.com',						// imgchr.com
+    'bed-1254016670.cos.ap-guangzhou.myqcloud.com'
+  ];
 var history_markdown_options = {
   html: false,
   xhtmlOut: false,
@@ -17,7 +24,7 @@ var history_markdown_options = {
 
   doHighlight: true,
   highlight: function (str, lang) {
-    if (!markdownOptions.doHighlight || !window.hljs) { return ''; }
+    if (!history_markdown_options.doHighlight || !window.hljs) { return ''; }
 
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -43,6 +50,54 @@ function update_title(title) {
 }
 
 var history_md = new Remarkable('full', history_markdown_options);
+
+if (typeof getDomain === 'undefined')
+  function getDomain(link) {
+    var a = document.createElement('a');
+    a.href = link;
+    return a.hostname;
+  }
+
+if (typeof isWhiteListed === 'undefined')
+  function isWhiteListed(link) {
+    return imgHostWhitelist.indexOf(getDomain(link)) !== -1;
+  }
+
+history_md.renderer.rules.image = function (tokens, idx, options) {
+  var src = Remarkable.utils.escapeHtml(tokens[idx].src);
+
+  if (isWhiteListed(src) && historyAllowImages || getDomain(src) == 'crosst.chat') {
+    var imgSrc = ' src="' + Remarkable.utils.escapeHtml(tokens[idx].src) + '"';
+    var title = tokens[idx].title ? (' title="' + Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(tokens[idx].title)) + '"') : '';
+    var alt = ' alt="' + (tokens[idx].alt ? Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(Remarkable.utils.unescapeMd(tokens[idx].alt))) : '') + '"';
+    var suffix = options.xhtmlOut ? ' /' : '';
+    // var scrollOnload = isAtBottom() ? ' onload="window.scrollTo(0, document.body.scrollHeight)"' : '';
+    // return '<a href="' + src + '" target="_blank" rel="noreferrer"><img' + scrollOnload + imgSrc + alt + title + suffix + '></a>';
+    return '<a href="' + src + '" target="_blank" rel="noreferrer"><img' + imgSrc + alt + title + suffix + '></a>';
+  }
+
+  return '<a href="' + src + '" target="_blank" rel="noreferrer">' + Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(src)) + '</a>';
+};
+
+history_md.renderer.rules.text = function (tokens, idx) {
+  tokens[idx].content = Remarkable.utils.escapeHtml(tokens[idx].content);
+
+  if (tokens[idx].content.indexOf('?') !== -1) {
+    tokens[idx].content = tokens[idx].content.replace(/(^|\s)(\?)\S+?(?=[,.!?:)]?\s|$)/gm, function (match) {
+      var channelLink = Remarkable.utils.escapeHtml(Remarkable.utils.replaceEntities(match.trim()));
+      var whiteSpace = '';
+      if (match[0] !== '?') {
+        whiteSpace = match[0];
+      }
+      return whiteSpace + '<a href="' + channelLink + '" target="_blank">' + channelLink + '</a>';
+    });
+  }
+
+  return tokens[idx].content;
+};
+
+history_md.use(remarkableKatex);
+
 
 let default_room = '公共聊天室';
 let default_trip = '';
@@ -104,7 +159,10 @@ var ct_history = {
       " where time >= ? and time <= ? and room like ? and nick like ? and trip like ? and text like ?",
       [start, stop, room, nick, trip, text]).then(result => {
         // console.log(result);
-        return Array(result.rows)[0];
+        let res_all = [];
+        for (let d of Array(result.rows)[0])
+          res_all.push(d);
+        return res_all;
       })
   },
   clear_message_room: function (room = default_room) {
@@ -125,6 +183,9 @@ var ct_history = {
     let nick = get_default($("#input-nick").value, '%');
     let trip = get_default($("#input-trip").value, '%');
     let text = get_default($("#input-text").value, '%');
+    let count = get_default($("#input-count").value, '50');
+    count = parseInt(count);
+    if (isNaN(count)) count = 50;
     let start_time = new Date(start_datetime).getTime();
     let stop_time = new Date(stop_datetime).getTime();
     if (room == '%') update_title("历史记录 - 全部房间");
@@ -133,6 +194,7 @@ var ct_history = {
       try {
         $('#messages').innerHTML = '';
         let data = await ct_history.find_messages(start_time, stop_time, room, nick, trip, text);
+        data = data.slice(-count);
         // console.log(data);
         for (let d of data) {
           ct_history.push_message(d);
@@ -227,6 +289,10 @@ async function history_main() {
   // let val_now = date_str[0] + 'T' + time;
   // console.log(val_now);
   // $("#input-time-stop").value = val_now;
+
+  // 设置到当前日期时间, 不然就一直加载所有聊天记录会浪费流量和cpu
+  if (moment)
+    $("#input-time-start").value = moment().format().slice(0, 11) + "00:00";
 
   // ct_history.find_messages().then(function(d) {
   //   console.log(d)

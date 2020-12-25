@@ -102,6 +102,11 @@ var imgHostWhitelist = [
 	'bed-1254016670.cos.ap-guangzhou.myqcloud.com'
 ];
 
+// 是否使用历史记录
+var enableHistory = true;
+// 是否消息通知
+var allowNotification = true;
+
 function getDomain(link) {
 	var a = document.createElement('a');
 	a.href = link;
@@ -264,7 +269,7 @@ function getHomepage() {
 			args.ver = "获取失败";
 			args.online = "获取失败";
 		}
-		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以**[点击这里](./jump.html)**创建自己的聊天室或者加入其它聊天室。\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
+		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以**[点击这里](./jump.html)**创建自己的聊天室或者加入其它聊天室。或者你可以查看[本地聊天记录](./history.html)\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
 		pushMessage({ text: homeText });
 	}
 }
@@ -506,7 +511,7 @@ function pushMessage(args) {
 
 	updateTitle();
 	updateNotice(args);
-	if (ct_history) {
+	if (ct_history && typeof enableHistory !== 'undefined' && enableHistory === true) {
 		// ct_history.push_message(args, false);
 		if (args.nick != '!' && args.nick) {
 			args.room = myChannel;
@@ -536,7 +541,7 @@ function updateNotice(args) {
 		m.message = message.text;
 		texts.push(m);
 	}
-	if (cordova)
+	if (cordova && allowNotification)
 		cordova.plugins.notification.local.schedule({
 			id: 1,
 			title: 'room',
@@ -660,23 +665,28 @@ $('#footer').onclick = function () {
 	$('#chatinput').focus();
 }
 
-// 切换上传文件那个窗口的状态
-var uploader_open = true;
-$('#uploader-button').onclick = function () {
-	let iframe = $('#uploader-iframe')
-	if (!iframe) return;
-	if (uploader_open)
-		iframe.classList.add('hidden');
-	else
-		iframe.classList.remove('hidden');
-	uploader_open = !uploader_open;
-}
+// // 切换上传文件那个窗口的状态
+// var uploader_open = true;
+// $('#uploader-button').onclick = function () {
+// 	let iframe = $('#uploader-iframe')
+// 	if (!iframe) return;
+// 	if (uploader_open)
+// 		iframe.classList.add('hidden');
+// 	else
+// 		iframe.classList.remove('hidden');
+// 	uploader_open = !uploader_open;
+// }
 
-function uploaderLoadDone(height) {
-	height = 350;
-	$('#uploader-iframe').height = height;
-	if ($('#uploader-button').onclick)
-		$('#uploader-button').onclick();
+// function uploaderLoadDone(height) {
+// 	height = 350;
+// 	$('#uploader-iframe').height = height;
+// 	if ($('#uploader-button').onclick)
+// 		$('#uploader-button').onclick();
+// }
+
+// v1.7.0 内嵌uploader
+$('#uploader-button').onclick = function () {
+	$("#file").click();
 }
 
 $('#emote').onchange = function () {
@@ -859,22 +869,25 @@ window.onresize = function () {
 };
 window.onresize();
 var history_open = true;
+function history_close() {
+	history_open = false;
+	$("#page-bottom").scrollIntoView();
+	$('#chat_history').classList.add('hidden');
+}
 $('#history-button').onclick = function () {
 	let iframe = $('#chat_history')
 	if (!iframe) return;
-	if (history_open)
-		iframe.classList.add('hidden');
+	if (history_open) {
+		$('#chat_history').classList.add('hidden');
+	}
 	else {
 		iframe.classList.remove('hidden');
+		scrollTo(0, 0);
 		frames['chat_history'].ct_history.query();
 	}
 	history_open = !history_open;
 }
 $('#history-button').onclick();
-function history_close() {
-	history_open = false;
-	$('#chat_history').classList.add('hidden');
-}
 
 /* main */
 if (myChannel == '') {

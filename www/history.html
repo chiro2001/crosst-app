@@ -44,7 +44,7 @@
       <hr />
       <div>
         下面未选择的参数则默认全选。<br />
-        参数可指定为SQL匹配符号。<br />
+        参数可指定为SQL匹配符号，如查询所有包含<b>Henrize</b>的消息，请在“内容”处输入<b>%Henrize%</b>。<br />
         开始时间: <br /><input class="input-query" id="input-time-start" type="datetime-local"
           value="1970-01-01T00:00"><br />
         结束时间: <br /><input class="input-query" id="input-time-stop" type="datetime-local"><br />
@@ -53,16 +53,22 @@
         高亮显示昵称: <input class="input-query" id="input-hightlight"><br />
         识别码: <input class="input-query" id="input-trip"><br />
         内容: <input class="input-query" id="input-text"><br />
+        查询限制条数: <input class="input-query" id="input-count" value="50"><br />
       </div>
       <br />
       <button id="button-query">开始查询</button><br />
       <p id="notice-query"></p><br />
       <hr />
+      <p>
+        <input id="history-allow-imgur" type="checkbox">
+        <label for="history-allow-imgur" title="">查看图片消息</label>
+      </p>
       <button id="button-clear">清除本地记录</button><br />
     </div>
   </nav>
   <!-- <script src="cordova.js"></script> -->
   <!-- <script src="./client.js"></script> -->
+  <script src="./vendor/moment/moment-with-locales.js"></script>
   <script src='./sidebar.js'></script>
   <!-- <script type='module' src="./extra_history.js"></script> -->
   <script src="./extra_history.js"></script>

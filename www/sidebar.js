@@ -65,6 +65,7 @@ var sidebar = {
 				$('#sidebar-content').classList.add('hidden');
 				$('#sidebar').classList.remove('expand');
 			}
+
 		}
 
 		// Load sidebar configaration values from local storage if available
@@ -76,6 +77,31 @@ var sidebar = {
 		if (localStorageGet('highlight')) {
 			setHighlight(localStorageGet('highlight'));
 		}
+
+		// appending: history-allow-imgur
+		if (typeof historyAllowImages === "undefined")
+			window['historyAllowImages'] = false;
+
+		if (localStorageGet('history-allow-imgur') === undefined)
+			localStorageSet('history-allow-imgur', false);
+		if (localStorageGet('history-allow-imgur') == 'true' && $('#history-allow-imgur')) {
+			$('#history-allow-imgur').checked = true;
+			historyAllowImages = true;
+		}
+
+		if ($('#history-allow-imgur'))
+			$('#history-allow-imgur').onchange = function (e) {
+				var enabled = !!e.target.checked;
+				localStorageSet('history-allow-imgur', enabled);
+				historyAllowImages = enabled;
+
+				if (typeof ct_history === 'undefined') return;
+				if (historyAllowImages) {
+					ct_history.query();
+				} else {
+					ct_history.query();
+				}
+			}
 	},
 	init: function () {
 		this.init_event();
@@ -147,10 +173,38 @@ var sidebar = {
 			allowImages = false;
 		}
 
+		if (localStorageGet('enable-history') == 'false') {
+			$('#enable-history').checked = false;
+			enableHistory = false;
+		}
+
+		if (localStorageGet('allow-notification') == 'false') {
+			$('#allow-notification').checked = false;
+			allowNotification = false;
+		}
+
 		$('#allow-imgur').onchange = function (e) {
 			var enabled = !!e.target.checked;
 			localStorageSet('allow-imgur', enabled);
 			allowImages = enabled;
+		}
+		
+		$('#allow-notification').onchange = function (e) {
+			var enabled = !!e.target.checked;
+			localStorageSet('allow-notification', enabled);
+			allowNotification = enabled;
+		}
+
+		$('#enable-history').onchange = function (e) {
+			var enabled = !!e.target.checked;
+			localStorageSet('enable-history', enabled);
+			enableHistory = enabled;
+
+			if (enableHistory) {
+				$("#history-div").classList.remove("hidden");
+			} else {
+				$("#history-div").classList.add("hidden");
+			}
 		}
 
 		/* color scheme switcher */
