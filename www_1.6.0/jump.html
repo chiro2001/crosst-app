@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>十字街</title>
+
+  <link rel="icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="./style.css">
+  <link id="scheme-link" rel="stylesheet" href="./schemes/%E9%BB%91%E8%89%B2%E7%B3%BB%20-%20%E5%AF%92%E5%A4%9C.css">
+
+  <link rel="stylesheet" href="./vendor/katex/katex.min.css">
+  <script src="./vendor/katex/katex.min.js"></script>
+  <script src="./vendor/remarkable-katex/remarkableKatex.min.js"></script>
+
+  <script src="./vendor/hljs/highlight.min.js"></script>
+  <link id="highlight-link" rel="stylesheet" href="./vendor/hljs/styles/rainbow.min.css">
+  <!-- <script src="https://cdn.staticfile.org/remarkable/1.7.1/remarkable.min.js"></script> -->
+  <script src="./vendor/remarkable/remarkable.min.js"></script>
+
+  <meta name="keywords" content="聊天室, 聊天, 匿名聊天, 纯文字聊天室, WebSocket, 即时聊天, 十字街, Henrize">
+  <meta name="description"
+    content="十字街是一个简洁轻小的匿名聊天网站，可以方便地加入和创建聊天室，仅需一个昵称即可开始畅聊。聊天室内支持 Markdown 和 LaTeX 格式化，并拥有便于开发的API。">
+
+
+</head>
+
+<body>
+  <audio style="display: none" id="notify-sound" preload="auto" src="./audio/notify.mp3">
+    <source src="audio/notify.mp3" type="audio/ogg">
+  </audio>
+  <article class="container">
+    <div id="messages" class="messages"></div>
+  </article>
+  <footer id="footer">
+    <div class="container">
+      <form id="chatform" class="message">
+        <textarea id="chatinput" type="text" autocomplete="off" autofocus></textarea>
+      </form>
+    </div>
+  </footer>
+  <nav id="sidebar">
+    <div id="sidebar-content" class="hidden">
+      <h2><a href="/" target="_blank" rel="noopener noreferrer">十字街</a></h2>
+      <h5 id="version-text"></h5>
+      <p>一个简洁轻小的聊天网站</p>
+      <p>邮箱：<a href="mailto:mail@to.henrize.kim">mail@to.henrize.kim</a></p>
+      <hr>
+      <h3>账号管理</h3>
+      <p>已登录：</p>
+      <p id="account-name"></p>
+      <p>
+        <input id="auto-login" type="checkbox">
+        <label for="auto-login">自动以此昵称登录</label>
+      </p>
+      <p>
+        <button id="clear-account">清除账号信息</button>
+      </p>
+      <hr>
+      <h4>在线用户</h4>
+      <p>（点击用户名，邀请该用户到一个随机生成的聊天室）</p>
+      <ul id="users"></ul>
+      <hr>
+      <select id="emote">
+        <option value="">无</option>
+        <option value="|∀ﾟ">|∀ﾟ</option>
+        <option value="(´ﾟДﾟ`)">(´ﾟДﾟ`)</option>
+        <option value="(;´Д`)">(;´Д`)</option>
+        <option value="(｀･ω･)">(｀･ω･)</option>
+        <option value="(=ﾟωﾟ)=">(=ﾟωﾟ)=</option>
+        <option value="| ω・´)">| ω・´)</option>
+        <option value="|-` )">|-` )</option>
+        <option value="|д` )">|д` )</option>
+        <option value="|ー` )">|ー` )</option>
+        <option value="|∀` )">|∀` )</option>
+        <option value="(つд⊂)">(つд⊂)</option>
+        <option value="(ﾟДﾟ≡ﾟДﾟ)">(ﾟДﾟ≡ﾟДﾟ)</option>
+        <option value="(＾o＾)ﾉ">(＾o＾)ﾉ</option>
+        <option value="(|||ﾟДﾟ)">(|||ﾟДﾟ)</option>
+        <option value="( ﾟ∀ﾟ)">( ﾟ∀ﾟ)</option>
+        <option value="( ´∀`)">( ´∀`)</option>
+        <option value="(*´∀`)">(*´∀`)</option>
+        <option value="(*ﾟ∇ﾟ)">(*ﾟ∇ﾟ)</option>
+        <option value="(*ﾟーﾟ)">(*ﾟーﾟ)</option>
+        <option value="(　ﾟ 3ﾟ)">(　ﾟ 3ﾟ)</option>
+        <option value="( ´ー`)">( ´ー`)</option>
+        <option value="( ・_ゝ・)">( ・_ゝ・)</option>
+        <option value="( ´_ゝ`)">( ´_ゝ`)</option>
+        <option value="(*´д`)">(*´д`)</option>
+        <option value="(・ー・)">(・ー・)</option>
+        <option value="(・∀・)">(・∀・)</option>
+        <option value="(ゝ∀･)">(ゝ∀･)</option>
+        <option value="(〃∀〃)">(〃∀〃)</option>
+        <option value="(*ﾟ∀ﾟ*)">(*ﾟ∀ﾟ*)</option>
+        <option value="( ﾟ∀。)">( ﾟ∀。)</option>
+        <option value="( `д´)">( `д´)</option>
+        <option value="(`ε´ )">(`ε´ )</option>
+        <option value="(`ヮ´ )">(`ヮ´ )</option>
+        <option value="σ`∀´)">σ`∀´)</option>
+        <option value=" ﾟ∀ﾟ)σ"> ﾟ∀ﾟ)σ</option>
+        <option value="ﾟ ∀ﾟ)ノ">ﾟ ∀ﾟ)ノ</option>
+        <option value="(╬ﾟдﾟ)">(╬ﾟдﾟ)</option>
+        <option value="(|||ﾟдﾟ)">(|||ﾟдﾟ)</option>
+        <option value="( ﾟдﾟ)">( ﾟдﾟ)</option>
+        <option value="Σ( ﾟдﾟ)">Σ( ﾟдﾟ)</option>
+        <option value="( ;ﾟдﾟ)">( ;ﾟдﾟ)</option>
+        <option value="( ;´д`)">( ;´д`)</option>
+        <option value="(　д ) ﾟ ﾟ">(　д ) ﾟ ﾟ</option>
+        <option value="( ☉д⊙)">( ☉д⊙)</option>
+        <option value="(((　ﾟдﾟ)))">(((　ﾟдﾟ)))</option>
+        <option value="( ` ・´)">( ` ・´)</option>
+        <option value="( ´д`)">( ´д`)</option>
+        <option value="( -д-)">( -д-)</option>
+        <option value="(>д<)">(&gt;д&lt;)</option>
+        <option value="･ﾟ( ﾉд`ﾟ)">･ﾟ( ﾉд`ﾟ)</option>
+        <option value="( TдT)">( TдT)</option>
+        <option value="(￣∇￣)">(￣∇￣)</option>
+        <option value="(￣3￣)">(￣3￣)</option>
+        <option value="(￣ｰ￣)">(￣ｰ￣)</option>
+        <option value="(￣ . ￣)">(￣ . ￣)</option>
+        <option value="(￣皿￣)">(￣皿￣)</option>
+        <option value="(￣艸￣)">(￣艸￣)</option>
+        <option value="(￣︿￣)">(￣︿￣)</option>
+        <option value="(￣︶￣)">(￣︶￣)</option>
+        <option value="ヾ(´ωﾟ｀)">ヾ(´ωﾟ｀)</option>
+        <option value="(*´ω`*)">(*´ω`*)</option>
+        <option value="(・ω・)">(・ω・)</option>
+        <option value="( ´・ω)">( ´・ω)</option>
+        <option value="(｀・ω)">(｀・ω)</option>
+        <option value="(´・ω・`)">(´・ω・`)</option>
+        <option value="(`・ω・´)">(`・ω・´)</option>
+        <option value="( `_っ´)">( `_っ´)</option>
+        <option value="( `ー´)">( `ー´)</option>
+        <option value="( ´_っ`)">( ´_っ`)</option>
+        <option value="( ´ρ`)">( ´ρ`)</option>
+        <option value="( ﾟωﾟ)">( ﾟωﾟ)</option>
+        <option value="(oﾟωﾟo)">(oﾟωﾟo)</option>
+        <option value="(　\^ω\^)">(　^ω^)</option>
+        <option value="(｡◕∀◕｡)">(｡◕∀◕｡)</option>
+        <option value="/( ◕‿‿◕ )\">/( ◕‿‿◕ )\</option>
+        <option value="ヾ(´ε`ヾ)">ヾ(´ε`ヾ)</option>
+        <option value="(ノﾟ∀ﾟ)ノ">(ノﾟ∀ﾟ)ノ</option>
+        <option value="(σﾟдﾟ)σ">(σﾟдﾟ)σ</option>
+        <option value="(σﾟ∀ﾟ)σ">(σﾟ∀ﾟ)σ</option>
+        <option value="|дﾟ )">|дﾟ )</option>
+        <option value="┃電柱┃">┃電柱┃</option>
+        <option value="ﾟ(つд`ﾟ)">ﾟ(つд`ﾟ)</option>
+        <option value="ﾟÅﾟ )　">ﾟÅﾟ )　</option>
+        <option value="⊂彡☆))д`)">⊂彡☆))д`)</option>
+        <option value="⊂彡☆))д´)">⊂彡☆))д´)</option>
+        <option value="⊂彡☆))∀`)">⊂彡☆))∀`)</option>
+        <option value="(´∀((☆ミつ">(´∀((☆ミつ</option>
+      </select>
+
+      <p>
+        <a href="./uploader/index.html" target="_blank"><button>上传文件</button></a>
+      </p>
+      <hr>
+      <h3>设置</h3>
+      <p>
+        <input id="pin-sidebar" type="checkbox">
+        <label for="pin-sidebar">侧边栏常开</label>
+      </p>
+      <p>
+        <input id="sound-switch" type="checkbox">
+        <label for="sound-switch">有人@我时播放提示音</label>
+      </p>
+      <p>
+        <input id="joined-left" type="checkbox" checked>
+        <label for="joined-left">用户加入/退出提醒</label>
+      </p>
+      <p>
+        <input id="parse-latex" type="checkbox" checked>
+        <label for="parse-latex">启用LaTeX</label>
+      </p>
+      <p>
+        <input id="syntax-highlight" type="checkbox" checked>
+        <label for="syntax-highlight">启用代码高光</label>
+      </p>
+      <p>
+        <input id="allow-imgur" type="checkbox" checked>
+        <label for="allow-imgur" title="">查看图片消息</label>
+      </p>
+      <p>
+      <h4>选择站点配色</h4>
+      <select id="scheme-selector"></select>
+      </p>
+      <p>
+      <h4>代码高光样式</h4>
+      <select id="highlight-selector"></select>
+      </p>
+      <p>
+        <button id="clear-messages">清空本页聊天记录</button>
+      </p>
+    </div>
+  </nav>
+  <!-- <script src="./client.js"></script> -->
+  <script>
+    window.onload = function () {
+      console.log('ready');
+      let input = undefined;
+      let retry = 3;
+      while (!input && retry) {
+        input = window.prompt("请输入房间名字");
+        retry--;
+      }
+      if (!input) input = '公共聊天室';
+      location.href = "./index.html?" + input;
+    }
+  </script>
+</body>
+
+</html>

@@ -30,6 +30,10 @@ if (typeof setScheme == 'undefined')
 				break;
 			case '黑色系 - 荧黄': setHighlight('zenburn');
 				break;
+			case '拜年祭': setHighlight('zenburn');
+				break;
+			case '黑色系 - 晨雾': setHighlight('rainbow');
+				break;
 		}
 		localStorageSet('scheme', scheme);
 	}
@@ -123,6 +127,17 @@ var sidebar = {
 			$('#sidebar-content').classList.remove('hidden');
 		}
 
+		if ($('#enable-fireworks')) {
+			if (localStorageGet('enable-fireworks') == 'true') {
+				$('#enable-fireworks').checked = true;
+			} else if (localStorageGet('enable-fireworks') === undefined) {
+				$('#enable-fireworks').checked = true;
+				localStorageSet("enable-fireworks", 'true');
+			} else {
+				$('#enable-fireworks').checked = false;
+			}
+		}
+
 		if (localStorageGet('sound-switch') == 'true') {
 			$('#sound-switch').checked = true;
 		}
@@ -139,6 +154,11 @@ var sidebar = {
 
 		$('#pin-sidebar').onchange = function (e) {
 			localStorageSet('pin-sidebar', !!e.target.checked);
+		}
+		if ($('#enable-fireworks')) {
+			$('#enable-fireworks').onchange = function (e) {
+				localStorageSet('enable-fireworks', !!e.target.checked);
+			}
 		}
 
 		$('#joined-left').onchange = function (e) {
@@ -188,7 +208,7 @@ var sidebar = {
 			localStorageSet('allow-imgur', enabled);
 			allowImages = enabled;
 		}
-		
+
 		$('#allow-notification').onchange = function (e) {
 			var enabled = !!e.target.checked;
 			localStorageSet('allow-notification', enabled);
@@ -213,7 +233,9 @@ var sidebar = {
 			'黑色系 - 寒夜',
 			'黑色系 - 都市',
 			'黑色系 - 荧黄',
-			'青色系 - 初夏'
+			'青色系 - 初夏',
+			'黑色系 - 晨雾',
+			'拜年祭',
 		];
 
 		var highlights = [
