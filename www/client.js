@@ -98,8 +98,9 @@ var md = new Remarkable('full', markdownOptions);
 var allowImages = true;
 var imgHostWhitelist = [
 	'i.loli.net',							// sm.ms
-	's1.ax1x.com',						// imgchr.com
-	'bed-1254016670.cos.ap-guangzhou.myqcloud.com'
+	's1.ax1x.com', 's2.ax1x.com', 'z3.ax1x.com', 's4.ax1x.com', // imgchr.com
+	'bed-1254016670.cos.ap-guangzhou.myqcloud.com',
+	'cdn.mrpig.cf'
 ];
 
 // 是否使用历史记录
@@ -269,7 +270,7 @@ function getHomepage() {
 			args.ver = "获取失败";
 			args.online = "获取失败";
 		}
-		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以**[点击这里](./jump.html)**创建自己的聊天室或者加入其它聊天室。\n[点击查看2021特别节目！](./2021.html?%E5%85%AC%E5%85%B1%E8%81%8A%E5%A4%A9%E5%AE%A4)\n或者你可以查看[本地聊天记录](./history.html)\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
+		var homeText = "# 十字街\n##### " + args.ver + " 在线人数：" + args.online + "\n-----\n欢迎来到十字街，这是一个简洁轻小的聊天室网站。\n预设聊天室列表：\n**[公共聊天室](./index.html?公共聊天室)**\n \n你也可以**[点击这里](./jump.html)**创建自己的聊天室或者加入其它聊天室。\n[点击查看2022特别节目！](./2022.html?%E5%85%AC%E5%85%B1%E8%81%8A%E5%A4%A9%E5%AE%A4)\n或者你可以查看[本地聊天记录](./history.html)\n聊天室支持Markdown和LaTeX，丰富你的表达。\n站长邮箱：mail@to.henrize.kim\n-----\n在使用本网站时，您应当遵守中华人民共和国的相关规定。\n如果您不在中国大陆范围内居住，您还应当同时遵守当地的法律规定。\nHenrize Kim & Crosst.Chat Dev Team\n2020/02/29\nHave a nice chat!";
 		pushMessage({ text: homeText });
 	}
 }
@@ -428,6 +429,62 @@ var COMMANDS = {
 		pushMessage(args);
 		localStorageSet('auto-login', 'false');
 	}
+}
+
+function pushHTML(args) {
+	// Message container
+	var messageEl = document.createElement('div');
+
+	messageEl.classList.add('message');
+
+	if (verifyNickname(myNick) && args.nick == myNick) {
+		messageEl.classList.add('me');
+	} else if (args.nick == '!') {
+		messageEl.classList.add('warn');
+	} else if (args.nick == '*') {
+		messageEl.classList.add('info');
+	} else if (args.admin) {
+		messageEl.classList.add('admin');
+	} else if (args.member) {
+		messageEl.classList.add('member');
+	}
+
+	// Nickname
+	var nickSpanEl = document.createElement('span');
+	nickSpanEl.classList.add('nick');
+	messageEl.appendChild(nickSpanEl);
+
+	if (args.trip) {
+		var tripEl = document.createElement('span');
+		tripEl.textContent = args.trip + " ";
+		tripEl.classList.add('trip');
+		nickSpanEl.appendChild(tripEl);
+	}
+
+	if (args.nick) {
+		var nickLinkEl = document.createElement('a');
+		nickLinkEl.textContent = args.nick;
+
+		var date = new Date(args.time || Date.now());
+		nickLinkEl.title = date.toLocaleString();
+		nickSpanEl.appendChild(nickLinkEl);
+	}
+
+	// Text
+	var textEl = document.createElement('div');
+	textEl.classList.add('text');
+	textEl.innerHTML = args.text;
+
+	messageEl.appendChild(textEl);
+
+	// Scroll to bottom
+	var atBottom = isAtBottom();
+	$('#messages').appendChild(messageEl);
+	if (atBottom) {
+		window.scrollTo(0, document.body.scrollHeight);
+	}
+
+	updateTitle();
 }
 
 function pushMessage(args) {

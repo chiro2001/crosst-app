@@ -1,7 +1,7 @@
 {
   "name": "chiro.crosst.chat",
   "displayName": "crosst-app",
-  "version": "1.0.0",
+  "version": "1.8.0",
   "description": "A sample Apache Cordova application that responds to the deviceready event.",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,8 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "cordova-electron": "^1.1.1",
+    "babel-cli": "^6.26.0",
+    "cordova-electron": "^3.0.0",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-local-notification": "^0.9.0-beta.2",

@@ -20,11 +20,12 @@ class Dm {
     if (this.me) className = "me";
     if (this.type == this.TYPE_ROLLING) {
       el = $$(`<div style="position: absolute; white-space: nowrap; -webkit-text-stroke: 0.2px black; 
-    font-weight: 1200;" id="danmaku-id-${this.id}" class="${className}"><div><h5>${this.trip ? '' + this.trip + ' ' : ""}<span class="nick">${this.nick}</span></h5><h1 style="color: ${this.color}; margin-top: -10px">${this.text}</h1></div></div>`);
+    font-weight: 1200;" id="danmaku-id-${this.id}" class="${className}"><div><h5><span class="span">${this.trip ? ('' + this.trip + ' ') : ''}</span><span class="nick" style="float: none; margin-left: 0">${this.nick}</span></h5><h1 style="color: ${this.color || 'white'}; margin-top: -10px">${this.text}</h1></div></div>`);
     } else {
-      el = $$(`<div style="position: absolute; white-space: nowrap; -webkit-text-stroke: 0.2px black; 
-      font-weight: 1200; text-align: center; width: 100%" id="danmaku-id-${this.id}" class="${className}"><div><h5>${this.trip ? '' + this.trip + ' ' : ""}<span class="nick">${this.nick}</span></h5><h1 style="color: ${this.color}; margin-top: -10px">${this.text}</h1></div></div>`);
+      el = $$(`<div style="white-space: nowrap; -webkit-text-stroke: 0.2px black; 
+      font-weight: 1200; text-align: center; width: 100%" id="danmaku-id-${this.id}" class="${className}"><div><h5><span class="span">${this.trip ? ('' + this.trip + ' ') : ''}</span><span class="nick" style="float: none; margin-left: 0">${this.nick}</span></h5><h1 style="color: ${this.color || 'white'}; margin-top: -10px">${this.text}</h1></div></div>`);
     }
+    console.log(this, el);
     return el;
   }
 };
@@ -42,6 +43,7 @@ export class Danmaku {
     // 现在右边的行数，从lineNow开始放弹幕
     this.lineRollingNow = 0;
     this.lineRollingStart = 3;
+    this.lineRollingStop = 8;
     this.lineStaticNow = {};
     this.lineStaticStart = 2;
     // danmaku编号
@@ -61,6 +63,7 @@ export class Danmaku {
     this.lineStaticNow[`_${line}`] = false;
   }
   async addDanmaku(args) {
+    $$("#danmaku-pool").css({marginTop: 100});
     // nick, trip, text, type, color, delay
     let dm = undefined;
     let levelTime = [
@@ -81,6 +84,7 @@ export class Danmaku {
       args.line = this.lineRollingNow + this.lineRollingStart;
       dm = new Dm(args);
       this.lineRollingNow++;
+      if (this.lineRollingStop === this.lineRollingNow) this.lineRollingNow = 0;
     } else {
       args.line = this.getStaticLine() + this.lineStaticStart;
       dm = new Dm(args);
@@ -106,9 +110,9 @@ export class Danmaku {
           console.log('done!');
           resolve();
         });
-      } else if (dm.type == this.TYPE_STATIC) {
+      } else /* if (dm.type == this.TYPE_STATIC) */ {
         el.css({
-          marginTop: dm.line * el.height(),
+          // marginTop: (dm.line - this.lineStaticStart) * el.height(),
         });
         setTimeout(() => {
           this.doneStaticLine(dm.line - this.lineStaticStart);
@@ -120,4 +124,3 @@ export class Danmaku {
     })
   }
 };
-

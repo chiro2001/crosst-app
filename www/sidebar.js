@@ -34,6 +34,12 @@ if (typeof setScheme == 'undefined')
 				break;
 			case '黑色系 - 晨雾': setHighlight('rainbow');
 				break;
+			case '黑色系 - 新春': setHighlight('zenburn');
+				break;
+			case '黑色系 - 晨雾': setHighlight('rainbow');
+				break;
+			case '白色系 - 入冬': setHighlight('xcode');
+				break;
 		}
 		localStorageSet('scheme', scheme);
 	}
@@ -193,6 +199,20 @@ var sidebar = {
 			allowImages = false;
 		}
 
+		if (localStorageGet('allow-html') == 'true') {
+			$('#allow-html').checked = true;
+			allowHTML = true;
+		}
+		
+		$('#allow-html').onchange = function (e) {
+			var enabled = !!e.target.checked;
+			if (!!e.target.checked) {
+				pushMessage({ nick: '!', text: '查看HTML消息有可能降低聊天室的安全性和体验，如果遇到让您不适的情况，您可以选择 清空本页聊天记录' });
+			}
+			localStorageSet('allow-html', enabled);
+			allowHTML = enabled;
+		}
+
 		if (localStorageGet('enable-history') == 'false') {
 			$('#enable-history').checked = false;
 			enableHistory = false;
@@ -236,6 +256,9 @@ var sidebar = {
 			'青色系 - 初夏',
 			'黑色系 - 晨雾',
 			'拜年祭',
+			'黑色系 - 新春',
+			'白色系 - 入冬',
+			'测试主题'
 		];
 
 		var highlights = [

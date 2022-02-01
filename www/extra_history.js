@@ -9,8 +9,9 @@ var historyAllowImages = false;
 if (typeof imgHostWhitelist === 'undefined')
   var imgHostWhitelist = [
     'i.loli.net',							// sm.ms
-    's1.ax1x.com',						// imgchr.com
-    'bed-1254016670.cos.ap-guangzhou.myqcloud.com'
+    's1.ax1x.com', 's2.ax1x.com', 'z3.ax1x.com', 's4.ax1x.com', // imgchr.com
+    'bed-1254016670.cos.ap-guangzhou.myqcloud.com',
+    'cdn.mrpig.cf'
   ];
 var history_markdown_options = {
   html: false,
